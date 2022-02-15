@@ -1,6 +1,5 @@
 #include<cassert>
 
-#include"./Operator.h"
 #include"../common/param.h"
 #include"./Add.h"
 //计算element wise加法 C = A + B

@@ -15,3 +15,6 @@ target_link_libraries(Tensor_test PUBLIC ${EXTRA_LIBS})
 
 add_executable(Add_test ./test/operator/Add_test.cu)
 target_link_libraries(Add_test PUBLIC ${EXTRA_LIBS})
+
+add_executable(Conv_test ./test/operator/Conv_test.cu)
+target_link_libraries(Conv_test PUBLIC ${EXTRA_LIBS})
