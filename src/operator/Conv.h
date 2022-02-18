@@ -1,3 +1,4 @@
+#pragma once
 #include"./Operator.h"
 
 template<typename T>
@@ -11,6 +12,9 @@ class Conv: public Operator<T,T>
         std::vector<int> pads;
         std::vector<int> strides;   
     public:
+        template<typename A>
+        friend std::ostream& operator<<(std::ostream&out,const Conv<A>& c);
+
         std::vector<int> output_shape(const std::vector<int> &X_shape, const std::vector<int> &W_shape) const;
         Conv(   const std::vector<int> &k_shape = {}, 
                 std::string pad_str = "", 

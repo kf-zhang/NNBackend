@@ -1,4 +1,4 @@
-
+#pragma once
 #include"./Operator.h"
 
 template<typename T>

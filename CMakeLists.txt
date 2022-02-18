@@ -8,6 +8,7 @@ enable_language(CUDA)
 
 add_subdirectory(src)
 list(APPEND EXTRA_LIBS operator)
+list(APPEND EXTRA_LIBS onnx2graph)
 
 
 add_executable(Tensor_test ./test/tensor/Tensor_test.cu)
@@ -18,3 +19,9 @@ target_link_libraries(Add_test PUBLIC ${EXTRA_LIBS})
 
 add_executable(Conv_test ./test/operator/Conv_test.cu)
 target_link_libraries(Conv_test PUBLIC ${EXTRA_LIBS})
+
+add_executable(Clip_test ./test/operator/Clip_test.cu)
+target_link_libraries(Clip_test PUBLIC ${EXTRA_LIBS})
+
+add_executable(onnx2graph_test ./test/onnx2graph/onnx2graph_test.cu)
+target_link_libraries(onnx2graph_test PUBLIC ${EXTRA_LIBS})

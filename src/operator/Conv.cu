@@ -46,6 +46,25 @@ __global__ void conv_kernel(const T *X,const T *W,const T *B, T *Y, int N, int C
     SET<T>(sum + B[m], Y, n, m, h, w, N, M, out_height, out_width);
 }
 
+template<typename T>
+std::ostream& operator<<(std::ostream&out,const Conv<T>& c)
+{
+    auto printVec = [&out] (std::string s,const std::vector<int>& v) 
+    {
+        out<<s<<":(";
+        for(auto i:v)
+            out << i <<",";
+        out<<")\n";
+    };
+    printVec("kernel_shape",c.kernel_shape);
+    printVec("pads",c.pads);
+    printVec("strides",c.strides);
+    printVec("dilations",c.dilations);
+    out<<"auto pad str:"<<c.auto_pad<<"\n";
+    return out;
+}
+
+
 
 //根据输入形状以及卷积核的形状计算输出的形状,X_shape应该为{N,C,H,W} W_shape应该为(M,C/group,kH,kW)
 template<typename T>
@@ -136,5 +155,11 @@ void Conv<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Ten
 
 
 template class Conv<int>;
+template std::ostream& operator<<(std::ostream&, const Conv<int>&);
+
 template class Conv<float>;
+template std::ostream& operator<<(std::ostream&,const  Conv<float>&);
+
 template class Conv<double>;
+template std::ostream& operator<<(std::ostream&,const Conv<double>&);
+

@@ -3,7 +3,7 @@
 #include<operator/Conv.h>
 
 
-
+//测试默认参数下的卷积操作
 void TEST_Conv_ConvForward(){
 
     TEST_START
@@ -41,6 +41,7 @@ void TEST_Conv_ConvForward(){
     TEST_END
 }
 
+//测试设置pads和strides后的卷积
 void TEST_Conv_ConvForwardWithPaddingStrides(){
     TEST_START
 
@@ -81,7 +82,7 @@ void TEST_Conv_ConvForwardWithPaddingStrides(){
     TEST_END
 }
 
-
+//测试只在一个维度上使用padding的卷积
 void TEST_Conv_ConvForwardWithAsymmetricPadding(){
     TEST_START
 
@@ -122,10 +123,23 @@ void TEST_Conv_ConvForwardWithAsymmetricPadding(){
     TEST_END
 }
 
+//测试 operator<<能否正常输出
+void TEST_Conv_ConvPrint(){
+    TEST_START
+
+    std::vector<int> pads = {1,0,1,0};
+    std::vector<int> strides = {2,2};
+    std::vector<int> W_shape = {1,1,3,3,};
+    Conv<int> conv(W_shape,"",1,pads,strides);
+    std::cout<<conv;
+
+    TEST_END
+}
 
 int main(){
     TEST_Conv_ConvForward();
     TEST_Conv_ConvForwardWithPaddingStrides();
     TEST_Conv_ConvForwardWithAsymmetricPadding();
+    TEST_Conv_ConvPrint();
     return 0;
 }
