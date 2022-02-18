@@ -22,7 +22,8 @@ if __name__ == "__main__":
     torch.onnx.export(
         model,
         X,
-        "demo0.onnx"
+        "demo0.onnx",
+        input_names = ["X"]
     )
     
     out = model(X)

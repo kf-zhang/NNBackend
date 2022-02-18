@@ -13,7 +13,7 @@ protected:
     std::vector<int> shape;
     T* data;
 public:
-    Tensor( const std::vector<int> &s = {}, T *d = nullptr);
+    Tensor( const std::vector<int> &s = {}, T *d = nullptr,int fromDevice = 0);
     Tensor(const Tensor<T> &s);
     Tensor &operator=(const Tensor &other);
     int size() const;
@@ -22,15 +22,16 @@ public:
     const T* gpu_pointer() const;//return exactly the data
     T*  raw_pointer();
     std::unique_ptr<T> cpu_pointer() const;//alllocate a memory in cpu, copy data from gpu to cpu
+    bool setmem(const Tensor<T>& tensor);
     virtual ~Tensor();
 };
 
 template<typename T>
 std::ostream& operator<<(std::ostream& out, const Tensor<T>& t);
 
-//d应该是指向cpu内存的指针
+//构造tensor,s为tensor形状,d为指向数据的指针,fromDevice表明指向device还是host
 template<typename T>
-Tensor<T>::Tensor(const std::vector<int> &s , T *d)
+Tensor<T>::Tensor(const std::vector<int> &s , T *d,int fromDevice)
 :shape(s)
 {
     int dim = shape.size();
@@ -43,10 +44,15 @@ Tensor<T>::Tensor(const std::vector<int> &s , T *d)
         this->data = nullptr;
     }   
     if(d)
-        gpuErrchk(cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyHostToDevice));
+    {
+        if(fromDevice)
+            gpuErrchk(cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyDeviceToDevice));
+        else
+            gpuErrchk(cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyHostToDevice));
+    }
 }
 
-//拷贝构造函数
+//拷贝构造函数,
 template<typename T>
 Tensor<T>::Tensor(const Tensor<T> &s)
 :shape(s.shape)
@@ -63,6 +69,7 @@ Tensor<T>::Tensor(const Tensor<T> &s)
         data = nullptr;
 }
 
+//赋值函数,会释放掉之前的内存,重新申请内存,然后拷贝数据
 template<typename T>
 Tensor<T>& Tensor<T>::operator=(const Tensor &other)
 {
@@ -73,9 +80,15 @@ Tensor<T>& Tensor<T>::operator=(const Tensor &other)
         gpuErrchk(cudaFree(data));
     shape = other.getShape();
 
-    gpuErrchk(cudaMalloc(&data, size() * sizeof(T)));
-    gpuErrchk(cudaMemcpy(data, other.gpu_pointer(), size() * sizeof(T), cudaMemcpyDeviceToDevice));
-    
+    if( size() )
+    {
+        gpuErrchk(cudaMalloc(&data, size() * sizeof(T)));
+        gpuErrchk(cudaMemcpy(data, other.gpu_pointer(), size() * sizeof(T), cudaMemcpyDeviceToDevice));
+    }
+    else
+    {
+        data = nullptr;
+    }
     return *this;
 }
 
@@ -145,9 +158,21 @@ Tensor<T>::~Tensor()
 }
 
 
+//复制tensor中的数据,两者必须做到形状相同
+template<typename T>
+bool Tensor<T>::setmem(const Tensor<T>& tensor)
+{
+    if( getShape()!=tensor.getShape() )
+        return false;
+    gpuErrchk( cudaMemcpy(data,tensor.gpu_pointer(),size()*sizeof(T),cudaMemcpyDeviceToDevice) );
+    return true;
+}
+
+
 //打印tensor的形状以及数据，由于涉及到数据的复制，会比较慢
 template<typename T>
-std::ostream& operator<<(std::ostream& out, const Tensor<T>& t){
+std::ostream& operator<<(std::ostream& out, const Tensor<T>& t)
+{
     std::vector<int> shape = t.getShape();
     int size = t.size();
     out<<"Tensor shape:(";
@@ -159,5 +184,8 @@ std::ostream& operator<<(std::ostream& out, const Tensor<T>& t){
         out<<*(p.get()+i)<<' ';
     return out;
 }
+
+
+
 
 

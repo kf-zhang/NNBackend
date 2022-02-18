@@ -9,6 +9,8 @@
 #include<operator/Conv.h>
 #include<onnx2graph/onnx2graph.h>
 
+
+//测试能否根据node生成对应的operator
 void TEST_onnx2graph_intinodeConv(const onnx::NodeProto &node){
     TEST_START
 
@@ -31,7 +33,7 @@ int loadModel(int argc,char*argv[],onnx::ModelProto& model)
         std::fstream input(argv[1], std::ios::in | std::ios::binary);
         if (!model.ParseFromIstream(&input)) 
         {
-            std::cerr << "Failed to parse address book." << std::endl;
+            std::cerr << "Failed to parse onnx file." << std::endl;
             return -1;
         }
     }

@@ -153,6 +153,13 @@ void Conv<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Ten
                 );
 }
 
+template<typename T>
+std::vector<std::vector<int>> Conv<T>::outShape(const std::vector<std::vector<int>> inShape)
+{
+    assert(inShape.size()>=2);
+    return output_shape(inShape.at(0),inShape.at(1));
+}
+
 
 template class Conv<int>;
 template std::ostream& operator<<(std::ostream&, const Conv<int>&);

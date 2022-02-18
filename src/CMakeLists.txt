@@ -12,7 +12,6 @@ target_link_libraries(
 )
 
 
-
 add_library(
     operator
     ./operator/Add.cu
@@ -32,18 +31,31 @@ add_library(
 )
 target_link_libraries(
     onnx2graph
-    PRIVATE
+    PUBLIC
     onnx
-    PRIVATE
+    PUBLIC
     operator
 )
 target_include_directories(
     onnx2graph
-    PRIVATE
+    PUBLIC
     /usr/local/cuda/include
+    INTERFACE 
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+
+add_library(
+    graph
+    ./graph/Graph.cpp
+)
+target_link_libraries(
+    graph
+    PUBLIC
+    onnx2graph
 )
 target_include_directories(
-    onnx2graph
-    INTERFACE 
+    graph
+    INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

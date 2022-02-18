@@ -16,6 +16,7 @@ class Conv: public Operator<T,T>
         friend std::ostream& operator<<(std::ostream&out,const Conv<A>& c);
 
         std::vector<int> output_shape(const std::vector<int> &X_shape, const std::vector<int> &W_shape) const;
+        std::vector<std::vector<int>> outShape(const std::vector<std::vector<int>> inShape) override;
         Conv(   const std::vector<int> &k_shape = {}, 
                 std::string pad_str = "", 
                 int group_num = 1, 
