@@ -36,6 +36,7 @@ void TEST_Graph_GraphInit(const onnx::ModelProto& model)
 
     Graph<int> g(model);
     std::cout << g<<"\n";
+
     TEST_END
 }
 
@@ -45,9 +46,8 @@ void TEST_Graph_GraphForward(const onnx::ModelProto& model)
 
     Graph<int> g(model);
     Tensor<int> input0({1,3,8,8});
-    Tensor<int> input1({1,3,9,9});
     g.forward( {&input0} );
-    g.forward( {&input1} );
+
     TEST_END
 }
 
@@ -55,12 +55,13 @@ void TEST_Graph_GraphForward(const onnx::ModelProto& model)
 int main(int argc,char*argv[])
 {
     onnx::ModelProto model;
+
     if( loadModel(argc,argv,model) )
         return -1;
     
     TEST_Graph_GraphInit(model);
+    // TEST_Graph_GraphForward(model);
 
-    TEST_Graph_GraphForward(model);
     return 0;
 }
 

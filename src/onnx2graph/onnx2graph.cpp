@@ -60,7 +60,26 @@ std::unique_ptr<Operator<T>> init_node(const onnx::NodeProto& node)
                                             );
     }
     if( node.op_type() == "Add")
+    {
         return std::unique_ptr<Operator<T>>( new Add<T>() );
+    }
+    if( node.op_type() == "Gemm" )
+    {
+        auto m = attributeList2map( node.attribute() );
+        float alpha = m.at("alpha").f();
+        float beta = m.at("beta").f();
+        int tA = m["transA"].i();
+        int tB = m["transB"].i();
+
+        // std::cout<<"alpha "<<alpha<<"\n";
+        // std::cout<<"beta "<<beta<<"\n";
+        // std::cout<<"tA "<<tA<<"\n";
+        // std::cout<<"tB "<<tB<<"\n";
+
+        return std::unique_ptr<Operator<T>>(
+                                                new Gemm<T>(alpha,beta,tA,tB)
+                                            );
+    }
     std::cout<<"unimplementated op_type "<< node.op_type() << " in init_node\n";
     return std::unique_ptr<Operator<T>>( nullptr );
 }

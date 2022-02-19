@@ -8,13 +8,12 @@ class net(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(3,16,3)
         self.relu1 = nn.ReLU6()
+        self.bn1 = nn.BatchNorm2d(16)
         self.conv2 = nn.Conv2d(16,32,3)
         self.relu2 = nn.ReLU6()
     def forward(self,X):
-        X = self.relu1(self.conv1(X))
-        print(X.shape)
+        X = self.bn1( self.relu1( self.conv1(X) ) )
         X = self.relu2(self.conv2(X))
-        print(X.shape)
         return X
 
 if __name__ == "__main__":

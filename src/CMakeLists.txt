@@ -17,6 +17,7 @@ add_library(
     ./operator/Add.cu
     ./operator/Conv.cu
     ./operator/Clip.cu
+    ./operator/Gemm.cu
 )
 target_include_directories(
     operator
