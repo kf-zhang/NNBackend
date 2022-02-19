@@ -154,10 +154,12 @@ void Conv<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Ten
 }
 
 template<typename T>
-std::vector<std::vector<int>> Conv<T>::outShape(const std::vector<std::vector<int>> inShape)
+std::vector<std::vector<int>> Conv<T>::outShape(const std::vector<std::vector<int>>& inShape) const
 {
     assert(inShape.size()>=2);
-    return output_shape(inShape.at(0),inShape.at(1));
+    std::vector<std::vector<int>> v;
+    v.push_back(output_shape(inShape.at(0),inShape.at(1)));
+    return  v;
 }
 
 

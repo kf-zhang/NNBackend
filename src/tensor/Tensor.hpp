@@ -34,8 +34,7 @@ template<typename T>
 Tensor<T>::Tensor(const std::vector<int> &s , T *d,int fromDevice)
 :shape(s)
 {
-    int dim = shape.size();
-    if(dim)
+    if(size())
     {
         gpuErrchk( cudaMalloc(&data, size() * sizeof(T)) );
     }
@@ -46,9 +45,13 @@ Tensor<T>::Tensor(const std::vector<int> &s , T *d,int fromDevice)
     if(d)
     {
         if(fromDevice)
-            gpuErrchk(cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyDeviceToDevice));
+        {
+            gpuErrchk( cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyDeviceToDevice) );
+        }
         else
-            gpuErrchk(cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyHostToDevice));
+        {
+            gpuErrchk( cudaMemcpy(data, d, size() * sizeof(T), cudaMemcpyHostToDevice) );
+        }
     }
 }
 
@@ -57,13 +60,10 @@ template<typename T>
 Tensor<T>::Tensor(const Tensor<T> &s)
 :shape(s.shape)
 {
-    if(data)
-        gpuErrchk(cudaFree(data));
-    
     if (size())
     {
         gpuErrchk(cudaMalloc(&data, size() * sizeof(T)));
-        gpuErrchk(cudaMemcpy(data, s.pointer(), size() * sizeof(T), cudaMemcpyDeviceToDevice));
+        gpuErrchk(cudaMemcpy(data, s.gpu_pointer(), size() * sizeof(T), cudaMemcpyDeviceToDevice));
     }
     else
         data = nullptr;

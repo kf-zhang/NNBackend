@@ -18,10 +18,10 @@ void TEST_Clip_OperatorForward(){
     int exp[6] = {0,1,6,2,6,0};;
     Tensor<int> C(shape);
 
-    Clip<int> clip;
+    Clip<int> clip(min,max);
     Operator<int>* op = &clip;
     
-    std::vector<Tensor<int>*> in({&A,&Tmin,&Tmax});
+    std::vector<Tensor<int>*> in({&A});
     std::vector<Tensor<int>*> out({&C});
     
     (*op)(in,out);

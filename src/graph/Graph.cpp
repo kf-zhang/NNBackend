@@ -100,10 +100,10 @@ Graph<T>::Graph(const onnx::ModelProto& model)
     initOperator(model.graph().node());
     forwardPath = forwardOrder(model);
     
-    for(const auto &name:model.graph().input())
-        inputs.push_back(name);
-    for(const auro&name:model.graph().input())
-        outputs.push_back(name);
+    for(const auto &val:model.graph().input())
+        inputs.push_back(val.name());
+    for(const auto&val:model.graph().output() )
+        outputs.push_back(val.name());
 
     std::cout<<"the number of operator in onnx : "<<model.graph().node_size()<<"\n";
     std::cout<<"the number of operator in forwardPath : "<<forwardPath.size()<<"\n";
@@ -160,6 +160,8 @@ std::vector<int> Graph<T>::forwardOrder(const onnx::ModelProto& model)
 }
 
 //将名字为names的tensor设置为val
+//如果tensor还未分配内存,先给tensor分配内存,再拷贝
+//如果已经分配内存,拷贝时需要确保形状相同
 template<typename T>
 bool Graph<T>::setTensor(const std::vector<std::string>&names,const std::vector<Tensor<T>*> val)
 {
@@ -170,37 +172,116 @@ bool Graph<T>::setTensor(const std::vector<std::string>&names,const std::vector<
     {
         std::string name = names.at(i);
         Tensor<T>* p = val.at(i);
-        int idx = name2tensorIdx[name];
-        if( idx == 0 )
+        int tensorIdx = name2tensorIdx[name];
+        if( tensorIdx == 0 )//graph中不存在对应的tensor
         {
             std::cerr<<"invalid tensor name: "<<name<<"\n";
             return false;
         }
-        if( !( tensors.at(idx).get() )->setmem(*p) ) 
+        
+        if( !tensors[tensorIdx] )//graph中tensor未分配内存
+        {
+            tensors[tensorIdx] = std::unique_ptr< Tensor<T> >(new Tensor<T>(p->getShape()) );
+        }
+        if( tensors[tensorIdx].get() ->setmem(*p) == false )//拷贝并检查返回值是否正确
+        {
+            std::cerr<<"setmem error in setTensor\n";
             return false;
+        }
     }
     return true;
 }
 
 //运行下标为idx的算子,输入输出来源于graph的tensor中
+//输入tensor必须已经初始化完成
+//输出tensor如果已经初始化,但是形状与计算所得形状不一致,返回false
+//如果输出tensor未初始化,则初始化该tensor并进行计算
 template<typename T>
-bool Graph<T>::runOp(int idx)
+bool Graph<T>::runOp(int opIdx)
 {
-    if(idx<0||idx>=ops.size()){
-        std::cerr<<"invalid idx "<<idx<<" in runOp"<<"\n";
+    if( opIdx<0 || opIdx>=ops.size() )
+    {
+        std::cerr<<"invalid idx "<<opIdx<<" in runOp"<<"\n";
         return false;
     }
+    std::vector<Tensor<T>*> inputTensorPointers;
+    std::vector<Tensor<T>*> outputTensorPointers;
+
+    std::cout<<"run op: "<<opIdx2name(opIdx)<<"\n";
+    std::vector<std::vector<int>> inputTensorShapes;
+    for( const std::string& inputTensorName: opInOut.at(opIdx).first )
+    {
+        int inputTensorIdx = name2tensorIdx[inputTensorName];
+        if(!tensors.at(inputTensorIdx))//输入tensor未初始化
+            return false;
+        inputTensorShapes.push_back( tensors.at(inputTensorIdx).get()->getShape() );
+        inputTensorPointers.push_back( tensors.at(inputTensorIdx).get() );
+
+        std::cout<<"\t input name: "<<inputTensorName<<"\n";
+    }
+
+    std::vector<std::vector<int>> outTensorShapes = ops.at(opIdx).get()->outShape(inputTensorShapes);
+
+    int outTensorNum = outTensorShapes.size();
+    for(int i=0;i<outTensorNum;i++)
+    {
+        int outTensorIdx = name2tensorIdx[ opInOut[opIdx].second[i] ]  ; 
+        if( ! tensors.at(outTensorIdx) )//输出tensor还没有分配内存
+        {
+            std::cout<<"allocate space for operator "<<opIdx2name(opIdx)<<"\n";
+            tensors.at(outTensorIdx) = std::unique_ptr<Tensor<T>>( new Tensor<T>(outTensorShapes.at(i)) );
+        }
+
+        outputTensorPointers.push_back( tensors.at(outTensorIdx).get() );
+    }
+
+    ops[opIdx]->operator()(inputTensorPointers,outputTensorPointers);
+
+    return true;
 }
 
+//从计算图中取出fetchTensorNames中对应的tensor
+//如果计算图中不存在对应的tensor,则返回形状为{0}的tensor
+template<typename T> 
+std::vector<Tensor<T>> Graph<T>::fetchTensors(const std::vector<std::string> &fetchTensorNames)
+{
+    std::vector<Tensor<T>> v;
+    for(const auto& name:fetchTensorNames)
+    {
+        Tensor<T>* tensorPointer = tensors[ name2tensorIdx[name] ].get();
+        if( tensorPointer )
+            v.push_back(*tensorPointer);
+        else
+            v.push_back(Tensor<T>({0}));
+    }
+    return v;
+}
+
+
 //计算图正向传播
+//首先按照in初始化inputs对应的tensor
+//然后按照拓扑排序逐个运行 operator
+//最后按照outputs取出计算图中对应的tensor并返回
 template<typename T>
 std::vector<Tensor<T>> Graph<T>::forward(const std::vector<Tensor<T>*> in)
 {
+    
     if( !setTensor(inputs,in) )
+    {
+        std::cerr<<"fail to set input tensors in forward"<<std::endl;
         return std::vector<Tensor<T>>();
+    }
+
     for(int idx:forwardPath )
+    {
         if( !runOp(idx) )
-            return false;
+        {
+            std::cerr<<"fail to run operator "<<opIdx2name(idx)<<" in forward"<<std::endl;
+            return std::vector<Tensor<T>>();
+        }
+    }
+
+    return fetchTensors(outputs);
 }
 
 

@@ -22,7 +22,7 @@ class Graph
         Graph() = default;
         std::vector<Tensor<T>> forward(const std::vector<Tensor<T>*> in);
         bool setTensor(const std::vector<std::string>&names,const std::vector<Tensor<T>*> val);
-
+        std::vector<Tensor<T>> fetchTensors(const std::vector<std::string>& fetchTensorNames );
     protected:
         std::string opIdx2name(int idx) const;
         std::vector<int> forwardOrder(const onnx::ModelProto& model);

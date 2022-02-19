@@ -39,10 +39,28 @@ std::unique_ptr<Operator<T>> init_node(const onnx::NodeProto& node)
                                                 ) 
                                             );
     }
+    if( node.op_type() == "Clip")
+    {
+        auto m = attributeList2map( node.attribute() );
+        T min;
+        T max;
+        if( typeid(T)==typeid(int) )
+        {
+            min = (T)m.at("min").i();
+            max = (T)m.at("max").i();
+        }
+        else
+        {
+            min = (T)m.at("min").f();
+            max = (T)m.at("max").f();
+        }
+
+        return std::unique_ptr<Operator<T>>( 
+                                            new Clip<T>(min,max)
+                                            );
+    }
     if( node.op_type() == "Add")
         return std::unique_ptr<Operator<T>>( new Add<T>() );
-    if( node.op_type() == "Clip")
-        return std::unique_ptr<Operator<T>>( new Clip<T>() );
     std::cout<<"unimplementated op_type "<< node.op_type() << " in init_node\n";
     return std::unique_ptr<Operator<T>>( nullptr );
 }

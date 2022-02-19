@@ -12,11 +12,13 @@ class net(nn.Module):
         self.relu2 = nn.ReLU6()
     def forward(self,X):
         X = self.relu1(self.conv1(X))
+        print(X.shape)
         X = self.relu2(self.conv2(X))
+        print(X.shape)
         return X
 
 if __name__ == "__main__":
-    X = torch.randn([128,3,32,32])
+    X = torch.randn([1,3,8,8])
     model = net()
     
     torch.onnx.export(

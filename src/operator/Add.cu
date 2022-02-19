@@ -26,6 +26,13 @@ void Add<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Tens
     add<T><<<ceill((double)size/BLOCK_SIZE),BLOCK_SIZE>>>(A->gpu_pointer(),B->gpu_pointer(),C->raw_pointer(),size);
 }
 
+template<typename T>
+std::vector<std::vector<int>> Add<T>::outShape(const std::vector< std::vector<int> >&inShape) const
+{
+    return inShape;
+}
+
+
 template class Add<int>;
 template class Add<float>;
 template class Add<double>;
