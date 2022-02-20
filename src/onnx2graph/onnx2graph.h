@@ -7,6 +7,7 @@
 #include"../operator/Add.h"
 #include"../operator/Clip.h"
 #include"../operator/Gemm.h"
+#include"../operator/GlobalAveragePool.h"
 
 //根据给定的att返回std::vector<int>
 std::vector<int> att2int_vector(const onnx::AttributeProto& att);

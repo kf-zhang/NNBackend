@@ -18,6 +18,7 @@ add_library(
     ./operator/Conv.cu
     ./operator/Clip.cu
     ./operator/Gemm.cu
+    ./operator/GlobalAveragePool.cu
 )
 target_include_directories(
     operator

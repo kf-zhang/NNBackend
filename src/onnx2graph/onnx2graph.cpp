@@ -80,6 +80,12 @@ std::unique_ptr<Operator<T>> init_node(const onnx::NodeProto& node)
                                                 new Gemm<T>(alpha,beta,tA,tB)
                                             );
     }
+    if( node.op_type() == "GlobalAveragePool")
+    {
+        return std::unique_ptr<Operator<T>>(
+                                                new GlobalAveragePool()
+                                            );
+    }
     std::cout<<"unimplementated op_type "<< node.op_type() << " in init_node\n";
     return std::unique_ptr<Operator<T>>( nullptr );
 }

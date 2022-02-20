@@ -16,6 +16,9 @@ class net(nn.Module):
         X = self.relu2(self.conv2(X))
         return X
 
+def writeTensor(X,fname):
+    fd = open(fname,"w")
+
 if __name__ == "__main__":
     X = torch.randn([1,3,8,8])
     model = net()
