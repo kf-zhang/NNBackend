@@ -6,10 +6,14 @@
 
 void TEST_Reshape_Reshape()
 {
+    TEST_START
+
     int data0[24] ={0,44,92,214,4324,54,62346,76,1,15,657,153,647,17635,123};
     Tensor<int> A({1,2,3,4},data0);
     Tensor<int> B({1*2*3*4});
-    int data[4]={1,2,3,4};
+    
+
+    int data[4]={1,2,3,-1};
     Tensor<int> newShape({4},data);
     Reshape<int> op;
 
@@ -22,7 +26,8 @@ void TEST_Reshape_Reshape()
     for(int i=0;i<size;i++)
         assert( *(p1.get()+i)==*(p2.get()+i) );
 
-    return;
+
+    TEST_END
 }
 
 int main()
