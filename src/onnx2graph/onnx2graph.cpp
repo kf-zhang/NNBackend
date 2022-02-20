@@ -83,7 +83,37 @@ std::unique_ptr<Operator<T>> init_node(const onnx::NodeProto& node)
     if( node.op_type() == "GlobalAveragePool")
     {
         return std::unique_ptr<Operator<T>>(
-                                                new GlobalAveragePool()
+                                                new GlobalAveragePool<T>()
+                                            );
+    }
+    if( node.op_type() == "BatchNormalization")
+    {
+        auto m = attributeList2map( node.attribute() );
+        float epsilon = m.at("epsilon").f();
+        float momentum = m.at("momentum").f();
+        int train_mode = m["training_mode"].i();
+
+        return std::unique_ptr<Operator<T>>(
+                                                new BatchNormalization<T>(epsilon,momentum,train_mode)
+                                            );   
+    }
+    if( node.op_type() == "Relu")
+    {
+        T max;
+        if( typeid(T)==typeid(float) )
+        {
+            max = FLOAT_MAX;
+        }
+        else if( typeid(T) == typeid(double))
+        {
+            max = DOUBLE_MAX;
+        }
+        else
+        {
+            max = INT_MAX;
+        }
+        return std::unique_ptr<Operator<T>>( 
+                                            new Clip<T>(0,max)
                                             );
     }
     std::cout<<"unimplementated op_type "<< node.op_type() << " in init_node\n";

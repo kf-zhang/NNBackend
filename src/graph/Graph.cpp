@@ -222,21 +222,23 @@ bool Graph<T>::runOp(int opIdx)
 
     std::vector<std::vector<int>> outTensorShapes = ops.at(opIdx).get()->outShape(inputTensorShapes);
 
+
     int outTensorNum = outTensorShapes.size();
     for(int i=0;i<outTensorNum;i++)
     {
         int outTensorIdx = name2tensorIdx[ opInOut[opIdx].second[i] ]  ; 
         if( ! tensors.at(outTensorIdx) )//输出tensor还没有分配内存
         {
-            std::cout<<"allocate space for operator "<<opIdx2name(opIdx)<<"\n";
+            std::cout<<"\t allocate space for operator "<<opIdx2name(opIdx)<<"\n";
             tensors.at(outTensorIdx) = std::unique_ptr<Tensor<T>>( new Tensor<T>(outTensorShapes.at(i)) );
         }
 
         outputTensorPointers.push_back( tensors.at(outTensorIdx).get() );
+
+        std::cout<<"\t output name: "<<opInOut[opIdx].second[i]<<"\n";
     }
-
+    
     ops[opIdx]->operator()(inputTensorPointers,outputTensorPointers);
-
     return true;
 }
 

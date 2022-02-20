@@ -179,9 +179,9 @@ std::ostream& operator<<(std::ostream& out, const Tensor<T>& t)
     for(int i:shape)
         out<<i<<",";
     out<<")\n";
-    std::unique_ptr<T> p = t.cpu_pointer();
-    for(int i=0;i<size;i++)
-        out<<*(p.get()+i)<<' ';
+    // std::unique_ptr<T> p = t.cpu_pointer();
+    // for(int i=0;i<size;i++)
+    //     out<<*(p.get()+i)<<' ';
     return out;
 }
 

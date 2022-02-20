@@ -29,9 +29,14 @@ target_link_libraries(Gemm_test PUBLIC ${EXTRA_LIBS})
 add_executable(GlobalAveragePool_test ./test/operator/GlobalAveragePool_test.cu)
 target_link_libraries(GlobalAveragePool_test PUBLIC ${EXTRA_LIBS})
 
+add_executable(BatchNormalization_test ./test/operator/BatchNormalization_test.cu)
+target_link_libraries(BatchNormalization_test PUBLIC ${EXTRA_LIBS})
+
 add_executable(onnx2graph_test ./test/onnx2graph/onnx2graph_test.cu)
 target_link_libraries(onnx2graph_test PUBLIC ${EXTRA_LIBS})
 
 add_executable(Graph_test ./test/graph/Graph_test.cpp)
 target_link_libraries(Graph_test PUBLIC ${EXTRA_LIBS})
 
+add_executable(demo0 ./demo/demo0/main.cpp)
+target_link_libraries(demo0 PUBLIC ${EXTRA_LIBS})

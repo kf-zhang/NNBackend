@@ -19,6 +19,7 @@ add_library(
     ./operator/Clip.cu
     ./operator/Gemm.cu
     ./operator/GlobalAveragePool.cu
+    ./operator/BatchNormalization.cu
 )
 target_include_directories(
     operator
