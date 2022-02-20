@@ -20,6 +20,7 @@ add_library(
     ./operator/Gemm.cu
     ./operator/GlobalAveragePool.cu
     ./operator/BatchNormalization.cu
+    ./operator/Reshape.cu
 )
 target_include_directories(
     operator

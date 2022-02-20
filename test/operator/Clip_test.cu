@@ -32,6 +32,7 @@ void TEST_Clip_OperatorForward(){
     TEST_END
 }
 
-int main(){
+int main()
+{
     TEST_Clip_OperatorForward();
 }

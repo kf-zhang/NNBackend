@@ -208,19 +208,19 @@ bool Graph<T>::runOp(int opIdx)
     std::vector<Tensor<T>*> outputTensorPointers;
 
     std::cout<<"run op: "<<opIdx2name(opIdx)<<"\n";
-    std::vector<std::vector<int>> inputTensorShapes;
+    // std::vector<std::vector<int>> inputTensorShapes;
     for( const std::string& inputTensorName: opInOut.at(opIdx).first )
     {
         int inputTensorIdx = name2tensorIdx[inputTensorName];
         if(!tensors.at(inputTensorIdx))//输入tensor未初始化
             return false;
-        inputTensorShapes.push_back( tensors.at(inputTensorIdx).get()->getShape() );
+        // inputTensorShapes.push_back( tensors.at(inputTensorIdx).get()->getShape() );
         inputTensorPointers.push_back( tensors.at(inputTensorIdx).get() );
 
         std::cout<<"\t input name: "<<inputTensorName<<"\n";
     }
 
-    std::vector<std::vector<int>> outTensorShapes = ops.at(opIdx).get()->outShape(inputTensorShapes);
+    std::vector<std::vector<int>> outTensorShapes = ops.at(opIdx).get()->outShape(inputTensorPointers);
 
 
     int outTensorNum = outTensorShapes.size();

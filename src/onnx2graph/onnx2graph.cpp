@@ -116,6 +116,12 @@ std::unique_ptr<Operator<T>> init_node(const onnx::NodeProto& node)
                                             new Clip<T>(0,max)
                                             );
     }
+    if( node.op_type() == "Reshape")
+    {
+        return std::unique_ptr<Operator<T>>(
+                                            new Reshape<T>()
+                                            );
+    }
     std::cout<<"unimplementated op_type "<< node.op_type() << " in init_node\n";
     return std::unique_ptr<Operator<T>>( nullptr );
 }

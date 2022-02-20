@@ -75,6 +75,7 @@ int main(int argc,char*argv[])
     for(int i=0;i<size;i++)
     {   
         float err = abs( *(p.get()+i) - output[i] );
+        std::cout<<err<<" ";
         maxErr = maxErr>err?maxErr:err;
     }
     std::cout<<"max error"<<maxErr<<std::endl;

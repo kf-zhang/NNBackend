@@ -16,7 +16,7 @@ __global__ void add(const T*A,const T*B,T*C,unsigned int size)
 template<typename T>
 void Add<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Tensor<T>*> &out ) const
 {
-    std::cout<<"0\n";
+    
     assert( in.size()==2    );
     assert( out.size()==1   );
     Tensor<T>* A = in.at(0);
@@ -24,15 +24,13 @@ void Add<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Tens
     Tensor<T>* C = out.at(0);
     assert( (A->getShape()==B->getShape())&&(A->getShape()==C->getShape()) );
     int size = A->size();
-    std::cout<<"1\n";
     add<T><<<ceill((double)size/BLOCK_SIZE),BLOCK_SIZE>>>(A->gpu_pointer(),B->gpu_pointer(),C->raw_pointer(),size);
-    std::cout<<"2\n";
 }
 
 template<typename T>
-std::vector<std::vector<int>> Add<T>::outShape(const std::vector< std::vector<int> >&inShape) const
+std::vector<std::vector<int>> Add<T>::outShape(const std::vector<Tensor<T>*> &in) const
 {
-    std::vector<int>  v(inShape.at(0));
+    std::vector<int>  v(in.at(0)->getShape() );
     return std::vector<std::vector<int>>({v});
 }
 

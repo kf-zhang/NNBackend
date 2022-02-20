@@ -53,11 +53,11 @@ void GlobalAveragePool<T>::operator()(const std::vector<Tensor<T> *> &in, const 
 
 
 template<typename T> 
-std::vector<std::vector<int>> GlobalAveragePool<T>::outShape(const std::vector<std::vector<int>> &inShape) const
+std::vector<std::vector<int>> GlobalAveragePool<T>::outShape(const std::vector<Tensor<T>*> &in) const
 {
-    assert( inShape.size() == 1);
+    assert( in.size() == 1);
 
-    std::vector<int> v(inShape.at(0));
+    std::vector<int> v(in.at(0)->getShape());
     assert(v.size()>=2);
     v.at(v.size()-1) = 1;
     v.at(v.size()-2) = 1;

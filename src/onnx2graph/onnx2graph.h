@@ -9,6 +9,7 @@
 #include"../operator/Gemm.h"
 #include"../operator/GlobalAveragePool.h"
 #include"../operator/BatchNormalization.h"
+#include"../operator/Reshape.h"
 #include"../common/param.h"
 //根据给定的att返回std::vector<int>
 std::vector<int> att2int_vector(const onnx::AttributeProto& att);

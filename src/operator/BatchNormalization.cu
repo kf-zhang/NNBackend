@@ -71,10 +71,10 @@ void BatchNormalization<T>::operator()(const std::vector<Tensor<T> *> &in, const
 
 
 template<typename T>
-std::vector<std::vector<int>> BatchNormalization<T>::outShape(const std::vector<std::vector<int>> &inShape) const
+std::vector<std::vector<int>> BatchNormalization<T>::outShape(const std::vector<Tensor<T>*> &in) const
 {
-    assert(inShape.size()>=1);
-    std::vector<int> v(inShape.at(0));
+    assert(in.size()>=1);
+    std::vector<int> v(in.at(0)->getShape());
 
     return std::vector<std::vector<int>>({v});
 }

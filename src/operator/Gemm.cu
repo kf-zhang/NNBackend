@@ -421,11 +421,11 @@ std::vector<int> Gemm<T>::output_shape(const std::vector<int> &A_shape, const st
 
 //计算输出tensor的形状
 template<typename T>
-std::vector<std::vector<int>> Gemm<T>::outShape(const std::vector< std::vector<int> >&inShape) const
+std::vector<std::vector<int>> Gemm<T>::outShape(const std::vector<Tensor<T>*> &in) const
 {
-    assert( inShape.size()>=2 );
+    assert( in.size()>=2 );
     std::vector<std::vector<int>> v;
-    v.push_back( output_shape(inShape.at(0),inShape.at(1)) );
+    v.push_back( output_shape(in.at(0)->getShape(),in.at(1)->getShape()) );
     return v;
 }
 

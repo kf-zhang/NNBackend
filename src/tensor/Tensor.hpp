@@ -23,6 +23,7 @@ public:
     T*  raw_pointer();
     std::unique_ptr<T> cpu_pointer() const;//alllocate a memory in cpu, copy data from gpu to cpu
     bool setmem(const Tensor<T>& tensor);
+    bool reshape(const std::vector<int>& newshape);
     virtual ~Tensor();
 };
 
@@ -165,6 +166,22 @@ bool Tensor<T>::setmem(const Tensor<T>& tensor)
     if( getShape()!=tensor.getShape() )
         return false;
     gpuErrchk( cudaMemcpy(data,tensor.gpu_pointer(),size()*sizeof(T),cudaMemcpyDeviceToDevice) );
+    return true;
+}
+
+//对tensor进行reshape,如果size不同则返回false
+template<class T> 
+bool Tensor<T>::reshape(const std::vector<int> &newshape)
+{
+    int num = 1;
+    if(!newshape.size())
+        num = 1;
+    else
+        for(int i:newshape)
+            num*=i;
+    if(num!=size())
+        return false;
+    shape = newshape;
     return true;
 }
 

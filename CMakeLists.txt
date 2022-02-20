@@ -32,6 +32,9 @@ target_link_libraries(GlobalAveragePool_test PUBLIC ${EXTRA_LIBS})
 add_executable(BatchNormalization_test ./test/operator/BatchNormalization_test.cu)
 target_link_libraries(BatchNormalization_test PUBLIC ${EXTRA_LIBS})
 
+add_executable(Reshape_test ./test/operator/Reshape_test.cu)
+target_link_libraries(Reshape_test PUBLIC ${EXTRA_LIBS})
+
 add_executable(onnx2graph_test ./test/onnx2graph/onnx2graph_test.cu)
 target_link_libraries(onnx2graph_test PUBLIC ${EXTRA_LIBS})
 
