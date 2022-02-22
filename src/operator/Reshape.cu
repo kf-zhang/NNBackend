@@ -54,6 +54,7 @@ void Reshape<T>::operator()(const std::vector<Tensor<T> *> &in, const std::vecto
 
     void* tmp = (void*)(in.at(1));
     Tensor<int> *newshape = (Tensor<int>*)(tmp) ;  
+
     std::vector<int> v; 
     auto data = newshape->cpu_pointer();
     int size = newshape->size();
@@ -61,7 +62,7 @@ void Reshape<T>::operator()(const std::vector<Tensor<T> *> &in, const std::vecto
         v.push_back(*(data.get()+i));
 
     auto setShape = newShape(Y->size(),v);
-
+    
     Y->reshape(setShape);
     Y->setmem(*X);
 }

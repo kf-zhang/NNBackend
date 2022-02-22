@@ -3,6 +3,7 @@
 #include <memory>
 #include<vector>
 #include<cuda_runtime.h>
+#include<cassert>
 
 #include"../common/util.hpp"
 
@@ -24,6 +25,7 @@ public:
     std::unique_ptr<T> cpu_pointer() const;//alllocate a memory in cpu, copy data from gpu to cpu
     bool setmem(const Tensor<T>& tensor);
     bool reshape(const std::vector<int>& newshape);
+    void printShape()const;
     virtual ~Tensor();
 };
 
@@ -163,8 +165,7 @@ Tensor<T>::~Tensor()
 template<typename T>
 bool Tensor<T>::setmem(const Tensor<T>& tensor)
 {
-    if( getShape()!=tensor.getShape() )
-        return false;
+    assert( size()==tensor.size() ); 
     gpuErrchk( cudaMemcpy(data,tensor.gpu_pointer(),size()*sizeof(T),cudaMemcpyDeviceToDevice) );
     return true;
 }
@@ -185,6 +186,14 @@ bool Tensor<T>::reshape(const std::vector<int> &newshape)
     return true;
 }
 
+template<typename T>
+void Tensor<T>::printShape() const
+{
+    std::cout<<"(";
+    for(const auto i:shape)
+        std::cout<<i<<",";
+    std::cout<<")\n";
+}
 
 //打印tensor的形状以及数据，由于涉及到数据的复制，会比较慢
 template<typename T>
@@ -196,9 +205,9 @@ std::ostream& operator<<(std::ostream& out, const Tensor<T>& t)
     for(int i:shape)
         out<<i<<",";
     out<<")\n";
-    // std::unique_ptr<T> p = t.cpu_pointer();
-    // for(int i=0;i<size;i++)
-    //     out<<*(p.get()+i)<<' ';
+    std::unique_ptr<T> p = t.cpu_pointer();
+    for(int i=0;i<size;i++)
+        out<<*(p.get()+i)<<' ';
     return out;
 }
 

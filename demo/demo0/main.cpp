@@ -6,12 +6,12 @@
 
 #include<graph/Graph.h>
 
-#define N (3)
+#define N (9)
 #define C (3)
-#define H (128)
-#define W (128)
+#define H (32)
+#define W (32)
 #define BUF_SIZE (N*C*H*W)
-#define OUT_SIZE (3*100)
+#define OUT_SIZE (9*100)
 
 //读取onnx文件,初始化model
 int loadModel(int argc,char*argv[],onnx::ModelProto& model)
@@ -40,12 +40,6 @@ int readData(const char* name,float* buf,int bufsize)
 }
 
 
-void forward(const onnx::ModelProto& model)
-{
-    Graph<int> g(model);
-    Tensor<int> input0({1,3,8,8});
-    g.forward( {&input0} );
-}
 
 
 int main(int argc,char*argv[])
@@ -66,6 +60,8 @@ int main(int argc,char*argv[])
     Graph<float> g(model);
     Tensor<float> in({N,C,H,W},input);
     auto out = g.forward({&in});
+    out = g.forward({&in});
+
 
     auto result = out.at(0);
     int size = result.size();
@@ -75,7 +71,7 @@ int main(int argc,char*argv[])
     for(int i=0;i<size;i++)
     {   
         float err = abs( *(p.get()+i) - output[i] );
-        std::cout<<err<<" ";
+        // std::cout<<err<<" ";
         maxErr = maxErr>err?maxErr:err;
     }
     std::cout<<"max error"<<maxErr<<std::endl;

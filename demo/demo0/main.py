@@ -7,18 +7,29 @@ import resnet
 class net(nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = nn.Conv2d(3,16,3)
+        self.conv1 = nn.Conv2d(3,16,3,stride=2)
         self.relu1 = nn.ReLU6()
         self.bn1 = nn.BatchNorm2d(16)
-        self.conv2 = nn.Conv2d(16,32,3)
+        
+        self.conv2 = nn.Conv2d(16,32,1)
         self.relu2 = nn.ReLU6()
+        
+        self.conv3 = nn.Conv2d(32,192,1,groups=32)
+        self.relu3 = nn.ReLU6()
+        
+        self.conv4 = nn.Conv2d(192,32,1,groups=32)
+        
         self.pool = nn.AdaptiveAvgPool2d(1)
         
     def forward(self,X):
         X = self.relu1( self.conv1(X) ) 
         X = self.bn1(X)
         X = self.relu2(self.conv2(X))
+        
+        X = self.relu3( self.conv3(X) )
+        X = self.conv4(X) 
         X = self.pool(X)
+        X = X.view(X.size(0),-1)
         return X
 
 def writeTensor(X:torch.Tensor,fname:str):
@@ -27,17 +38,41 @@ def writeTensor(X:torch.Tensor,fname:str):
     for item in arr:
         fd.write( str(item)+" " ) 
 
+def getNet():
+    inputName = "NetInput.txt"
+    outputName = "NetOutput.txt"
+    onnxFileName = "Net.onnx"
     
-
-if __name__ == "__main__":
-    inputName = "input.txt"
-    outputName = "output.txt"
-    onnxFileName = "demo0.onnx"
     
-    X = torch.randn([3,3,128,128])
+    X = torch.randn([9,3,32,32])
     writeTensor(X.detach().numpy(),inputName)
     
-    # model = net()
+    model = net()
+    torch.onnx.export(
+        model,
+        X,
+        onnxFileName,
+        input_names = ["X"]   
+    )
+    
+    model = onnx.load(onnxFileName)
+    outputNames = [i.name for i in model.graph.output]
+    
+    sess = onnxruntime.InferenceSession(onnxFileName)
+    outputs = sess.run(outputNames,{"X":X.detach().numpy()})
+    writeTensor(outputs[0],outputName)
+    print("net input shape: ",X.detach().numpy().shape)
+    print("net output shape: ",outputs[0].shape)    
+
+def getResNet():
+    inputName = "ResNet18Input.txt"
+    outputName = "ResNet18Output.txt"
+    onnxFileName = "ResNet18.onnx"
+    
+    
+    X = torch.randn([9,3,32,32])
+    writeTensor(X.detach().numpy(),inputName)
+    
     model = resnet.resnet18()
     torch.onnx.export(
         model,
@@ -48,11 +83,15 @@ if __name__ == "__main__":
     
     model = onnx.load(onnxFileName)
     outputNames = [i.name for i in model.graph.output]
-
     
     sess = onnxruntime.InferenceSession(onnxFileName)
     outputs = sess.run(outputNames,{"X":X.detach().numpy()})
     writeTensor(outputs[0],outputName)
-    print("input shape: ",X.detach().numpy().shape)
-    print("output shape: ",outputs[0].shape)
+    print("resnet18 input shape: ",X.detach().numpy().shape)
+    print("resnet18 output shape: ",outputs[0].shape)
+
+
+if __name__ == "__main__":
+    getNet()
+    getResNet()
     

@@ -41,6 +41,7 @@ void Clip<T>::operator()(const std::vector<Tensor<T>*> &in,const std::vector<Ten
 template<typename T>
 std::vector<std::vector<int>> Clip<T>::outShape(const std::vector<Tensor<T>*> &in ) const
 {
+    assert(in.size()==1);
     std::vector<std::vector<int>> inShape;
     for(const auto&p:in)
         inShape.push_back(p->getShape());

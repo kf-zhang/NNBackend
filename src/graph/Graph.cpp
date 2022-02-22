@@ -239,6 +239,8 @@ bool Graph<T>::runOp(int opIdx)
     }
     
     ops[opIdx]->operator()(inputTensorPointers,outputTensorPointers);
+
+    outputTensorPointers[0]->printShape();
     return true;
 }
 
